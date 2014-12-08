@@ -1,4 +1,6 @@
 var exec = require('child_process').exec;
+var fs = require('fs');
+try {var paths = require('../../pc-voice-interface/pathcache.json');} catch(err) {var paths = {};}
 
 function reactOn(speach) {
 	drawTable(speach);
@@ -22,10 +24,25 @@ function findCommands(speach) {
 }
 
 function executeCommand(action, subject) {
-	exec('for /f usebackq %i in (`fsutil fsinfo drives`) do\
-		 (for /f usebackq %i in (`dir d:\\' + subject + '.* /s/b`) do start %i)', 
-		function(err) {console.log(err);});
-	
+	if (!paths[subject]) findAndStart(subject);
+	else exec(paths[subject], function (err, out) {if (err) findAndStart(subject);});
+}
+
+function findAndStart(filename) {		// async!!
+	exec('chcp 65001 | for /f "usebackq skip=1 delims=:" %i in \
+		 (`"wmic logicaldisk where (drivetype="3") get Caption"`) \
+		 do @dir %i:\\' + filename + '.* /s /b', 
+		function (error, stdout, stderr) {
+			if (error) console.log('error: ', error);
+			if (!stdout) return;	// файл не найден
+			paths[filename] = stdout.toString().slice(0, -2);
+			exec(paths[filename], function (err) {if (err) console.log('error: ', err);});
+			fs.writeFile('../../pc-voice-interface/pathcache.json', // C:\Users\UserName\AppData\Local\
+						JSON.stringify(paths, "", 4), 
+						function (err) {if (err) console.log('error: ', err);}
+			);
+		}
+    );
 }
 
 function drawTable(speach) {

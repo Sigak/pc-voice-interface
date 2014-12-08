@@ -5,6 +5,7 @@
     <script type="text/javascript" src="http://www.yandex.st/jquery-ui/1.11.1/jquery-ui.min.js"></script>
     <script type="text/javascript" src="libs/webspeechkit.min.js"></script>
 	<script type="text/javascript" src="actions.js"></script>
+	<script type="text/javascript" src="key.js"></script>
 
     <meta charset="utf-8">
     <meta content="initial-scale=1, minimum-scale=1, width=device-width" name="viewport">
@@ -26,7 +27,7 @@
                 return v.toString(16);
                 });
 
-        var key = yourAPIkey; //You can get it here: https://developer.tech.yandex.ru
+        var key = yourAPIkey; // You can get it here: https://developer.tech.yandex.ru
 
         var dict = new webspeechkit.Dictation("wss://webasr.yandex.net/asrsocket.ws", uuid, key);
 		

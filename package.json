@@ -1,4 +1,5 @@
 {
-	"name": "nw-demo",
-	"main": "index.html"
+	"name": "pc-voice-interface",
+	"main": "index.html",
+	"version": "0.1.0"
 }
