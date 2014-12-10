@@ -8,6 +8,7 @@ The work is in progress, so this app will learn more things very soon.
 
 Anyway, even now it is very cool, 'cause you don't need to remember where your files and programmes are. Just command it to open something (or turn on, or find - any actions) and the app will find and open the file for you.
 
+<img src="http://i.gyazo.com/8e5b50ffaf606c9d26e14998a54e23c5.png">
 
 To use it, you need to replace the variable 'yourAPIkey' in index.html with your Yandex SpeechKit API key. You can get it here: https://developer.tech.yandex.ru
 Then build an nw app by following this instructions: https://github.com/rogerwang/node-webkit
