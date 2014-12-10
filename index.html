@@ -1,71 +1,80 @@
 <!DOCTYPE html>
-<html class="no-js consumer" lang="en">
-  <head>
-    <script type="text/javascript" src="http://www.yandex.st/jquery/2.1.1/jquery.min.js"></script>
-    <script type="text/javascript" src="http://www.yandex.st/jquery-ui/1.11.1/jquery-ui.min.js"></script>
-    <script type="text/javascript" src="libs/webspeechkit.min.js"></script>
-	<script type="text/javascript" src="actions.js"></script>
-	<script type="text/javascript" src="key.js"></script>
-
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="style.css" />
     <meta charset="utf-8">
     <meta content="initial-scale=1, minimum-scale=1, width=device-width" name="viewport">
-    <title>Webspeechkit example</title>
-  </head>
-  <body class="" id="grid">
-    <input type="button" id="start_btn" value="Start"/>
-    <input type="button" id="stop_btn" value="Stop"/>
-    <div id="info">
-        Send <span id="bytes_send">0</span> bytes / <span id="packages_send">0</span> packages / Processed <span id="processed">0</span> packages
+</head>
+
+<body>
+    <div class="titlebar">
+           <div id="window-min">-</div>
+		   <div id="window-close">x</div>
     </div>
-    <div id="results">
-        <span class="final" id="content_uttr"></span> <span class="interim" id="content_curr"></span>
+  
+	<div class="container">
+		<button id="mic_btn"><img src="mic.png"></button>
+		<!-- <div id="mic_btn"></div> -->
     </div>
 
-    <script>
+	
+	
+	<script src="http://www.yandex.st/jquery/2.1.1/jquery.min.js"></script>
+    <script src="http://www.yandex.st/jquery-ui/1.11.1/jquery-ui.min.js"></script>
+    <script src="libs/webspeechkit.min.js"></script>
+	<script src="actions.js"></script>
+	<script src="key.js"></script>
+	<script>
+		var gui = require('nw.gui');
+		var win = gui.Window.get();
+		$('#window-close').on("click", function() {win.close();});
+		$('#window-min').on("click", function() {win.minimize();});
+		var tray = new gui.Tray({icon: 'mic.png' });
+		tray.on('click', function() {win.restore();});
+
         var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
             var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
                 return v.toString(16);
                 });
-
         var key = yourAPIkey; // You can get it here: https://developer.tech.yandex.ru
-
         var dict = new webspeechkit.Dictation("wss://webasr.yandex.net/asrsocket.ws", uuid, key);
+		var mic = $('#mic_btn');
+        
+		mic.on("click", function() {
+			if (mic.hasClass("active_mic")) {dict.stop(); mic.removeClass("active_mic");}
+			else {
+				mic.addClass("active_mic"); 
+				$('<div class="user_voice"><span class="content_uttr"></span><span class="content_curr"></span></div>')
+				  .appendTo(".container");
+				start();
+			}
+		});
 		
-		start_btn.onclick = function() {
-			
-            var format = webspeechkit.FORMAT["PCM16"];
-				
-                $('#content_uttr').html('');
-                $('#content_curr').html('');
-				dict.start(format,
-                    function(){},
-                    function(msg) {console.log(msg); alert(msg);},
-                    function(text, uttr, merge) {
-                        if (uttr) {
-							var queryparams = {
-								text: text,
-								key: key,
-								layers: 'Date,Fio,GeoAddr,ProcessedRequest,Tokens,Morph' 
-							};
-                            $('#content_uttr').append(' ' + text); 
-							text = "";
-							$.getJSON( "https://vins-markup.voicetech.yandex.net/markup/0.x/", queryparams,
-									function(data) {console.log(data); reactOn(data);});
-							console.log(queryparams);
-							dict.stop();
-                        }
-                        $('#content_curr').html(text);
-                    },
-                    function(info) {
-                       $('#bytes_send').html(info.send_bytes);
-                       $('#packages_send').html(info.send_packages);
-                       $('#processed').html(info.processed);
+		function start() {
+			dict.start('',
+                function(){},
+                function(msg) {console.log(msg); alert(msg);},
+                function(text, uttr, merge) {
+                    if (uttr) {
+						var queryparams = {
+							text: text,
+							key: key,
+							layers: 'Date,Fio,GeoAddr,ProcessedRequest,Tokens,Morph' 
+						};
+                        $('.content_uttr').last().append(' ' + text); 
+						text = "";
+						$.getJSON( "https://vins-markup.voicetech.yandex.net/markup/0.x/", queryparams,
+								function(data) {console.log(data); reactOn(data);});
+						console.log(queryparams);
+						dict.stop();
+						mic.removeClass("active_mic");
                     }
-                );
+                    $('.content_curr').last().html(text);
+                },
+                function(info) {console.log('sending audio: ', info);}
+            );
         }
-
-        stop_btn.onclick = dict.stop;
-
+		
     </script>
-  </body>
+</body>
 </html>

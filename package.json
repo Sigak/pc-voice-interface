@@ -1,5 +1,14 @@
 {
 	"name": "pc-voice-interface",
 	"main": "index.html",
-	"version": "0.1.0"
+	"version": "0.1.0",
+	"window": {
+		"title": "Голосовое управление компьютером",
+		"toolbar": false,
+		"frame": false,
+		"show_in_taskbar": false,
+		"width": 350,
+		"height": 500,
+		"resizable": "false"
+	}
 }

@@ -3,7 +3,7 @@ var fs = require('fs');
 try {var paths = require('../../pc-voice-interface/pathcache.json');} catch(err) {var paths = {};}
 
 function reactOn(speach) {
-	drawTable(speach);
+	//drawTable(speach);
 	findCommands(speach);
 }
 
