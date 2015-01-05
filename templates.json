@@ -1,0 +1,7 @@
+{
+"enoent": "Файл \"<%filename%>\" не найден.<div><label><span id=\"<%id%>\"></span><input type=\"button\" value=\"Выберите файл\"><input type=\"file\" onchange=\"$('#<%id%>').html(value.slice(value.lastIndexOf('\\\\')+1)+' '); addPath('<%filename%>', value, true);\"></label><BR>или просто перетащите его сюда.</div>",
+"execErr": "Не могу открыть файл \"<%filename%>\"",
+"multipleTop": "Найдено <%ammount%> файлов. Выберите какой открыть:<BR>",
+"multiple": "<li ondblclick=\"getUserChoise('<%filename%>');\"><input type=\"radio\" name=\"<%filename%>\" value=\"<%index%>\" id=\"<%id%>\"><label for=\"<%id%>\"><%fullname%><p title=\"<%path%>\"><%shortpath%></p></label></li>",
+"multipleBottom": "<label><input type=\"checkbox\" name=\"<%filename%>\"> Запомнить выбор</label><BR><input type=\"button\" name=\"<%filename%>\" value=\"Открыть\" onclick=\"getUserChoise(name);\">"
+}

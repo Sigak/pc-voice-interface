@@ -8,14 +8,12 @@
 
 <body>
     <div class="titlebar">
+		   <div id="settings"></div>
            <div id="window-min">-</div>
 		   <div id="window-close">x</div>
     </div>
-  
-	<div class="container">
-		<button id="mic_btn"><img src="mic.png"></button>
-		<!-- <div id="mic_btn"></div> -->
-    </div>
+	<header><button id="mic_btn"><img src="pic/mic.png"></button></header>
+	<div class="container"></div>
 
 	
 	
@@ -29,9 +27,18 @@
 		var win = gui.Window.get();
 		$('#window-close').on("click", function() {win.close();});
 		$('#window-min').on("click", function() {win.minimize();});
-		var tray = new gui.Tray({icon: 'mic.png' });
-		tray.on('click', function() {win.restore();});
-
+		$('#settings').on("click", function() {win.showDevTools();});
+		var tray = new gui.Tray({icon: 'pic/ico.png' });
+		tray.on('click', function() {win.show();});
+		$('body').on('dragenter', false).on('dragover', false).on('dragleave', false)
+			.on('dragend', false).on('drop', false);
+		win.on('close', writeCache);
+		var container = $('.container')[0];
+		
+		function scrollDown() {
+			container.scrollTop = container.scrollHeight - container.clientHeight;
+		}
+		
         var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
             var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
                 return v.toString(16);
@@ -39,41 +46,84 @@
         var key = yourAPIkey; // You can get it here: https://developer.tech.yandex.ru
         var dict = new webspeechkit.Dictation("wss://webasr.yandex.net/asrsocket.ws", uuid, key);
 		var mic = $('#mic_btn');
-        
+        		
 		mic.on("click", function() {
 			if (mic.hasClass("active_mic")) {dict.stop(); mic.removeClass("active_mic");}
 			else {
 				mic.addClass("active_mic"); 
-				$('<div class="user_voice"><span class="content_uttr"></span><span class="content_curr"></span></div>')
-				  .appendTo(".container");
-				start();
+				$('<div class="user_voice"></div>').appendTo(container);
+				dict.start('', function(){}, function(err) {console.log('dict.start: ', err);},
+							makeSence, function(info) {});
 			}
 		});
 		
-		function start() {
-			dict.start('',
-                function(){},
-                function(msg) {console.log(msg); alert(msg);},
-                function(text, uttr, merge) {
-                    if (uttr) {
-						var queryparams = {
-							text: text,
-							key: key,
-							layers: 'Date,Fio,GeoAddr,ProcessedRequest,Tokens,Morph' 
-						};
-                        $('.content_uttr').last().append(' ' + text); 
-						text = "";
-						$.getJSON( "https://vins-markup.voicetech.yandex.net/markup/0.x/", queryparams,
-								function(data) {console.log(data); reactOn(data);});
-						console.log(queryparams);
-						dict.stop();
-						mic.removeClass("active_mic");
-                    }
-                    $('.content_curr').last().html(text);
-                },
-                function(info) {console.log('sending audio: ', info);}
-            );
+		function makeSence(text, finished) {
+			$('.user_voice').last().html(text);
+			scrollDown();
+			if (finished) {
+				dict.stop();
+				mic.removeClass("active_mic");
+				var queryparams = {
+					text: text,
+					key: key,
+					layers: 'Date,Fio,GeoAddr,ProcessedRequest,Tokens,Morph' 
+				};
+				$.getJSON( "https://vins-markup.voicetech.yandex.net/markup/0.x/", queryparams, 
+							function(data) { var command = findCommands(parseSentence(data)); 
+								if (command.act) executeCommand(command.act, command.subj);
+								//drawTable(data);
+								//console.log(parseSentence(data));
+								scrollDown();}
+				);
+            }
         }
+		
+		function parseSentence(data) {
+			var phrase = []
+			for (var i = 0; i < data.Tokens.length; i++) {
+				phrase[i] = {};
+				phrase[i].input = data.Tokens[i].Text;
+				var word = data.Morph[i].Lemmas[0];
+				phrase[i].inf = word.Text;
+				var gram = word.Grammems ? word.Grammems[0].split(' ') : [];
+				for (var j = 0; j < gram.length; j++) phrase[i][gram[j]] = true;
+			}
+			if (data.Fio) for (var i = 0; i < data.Fio.length; i++) 
+				for (var j = data.Fio[i].Tokens.Begin; j < data.Fio[i].Tokens.End; j++)
+					phrase[j].fio = true;
+			return phrase;
+		}
+
+		function findCommands(phrase) {
+			var vIdx, command = {};
+			var subj = [];
+			for (var i = 0; i < phrase.length; i++) {
+				if (phrase[i].V && phrase[i].imper) {vIdx = i; command.act = phrase[vIdx].inf;}
+				if (command.act && phrase[i].S && phrase[i].sg && !phrase[i].n) {
+					phrase[i].final = phrase[i].inf;
+					for (var j = vIdx+1; j <= Math.min(i+1, phrase.length-1); j++) {
+						if (phrase[j].A || phrase[j].fio) phrase[j].final = phrase[j].inf;
+					}
+				}
+				if (command.act && phrase[i].S) break;
+			}
+			for (var i = vIdx+1; i < phrase.length; i++) subj.push(phrase[i].final || phrase[i].input);
+			command.subj = subj.join(' ');
+			if (command.act) console.log('findCommands: ', command.act, subj);
+			else console.log('findCommands: команды не найдены');
+			return command;
+		}
+
+
+		function drawTable(speach) {
+			var items = [];
+			for (var i = 0; i < speach.Morph.length; i++) {
+				var word = speach.Morph[i].Lemmas[0];
+				if (word.Grammems)
+				items.push( "<tr><td>" + word.Text + "</td><td>" + word.Grammems[0] + "</td></tr>" );
+			}
+			$( "<table/>", {html: items.join( "" )}).appendTo(container);
+		}
 		
     </script>
 </body>
