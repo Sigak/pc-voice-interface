@@ -2,10 +2,10 @@
 	"name": "pc-voice-interface",
 	"main": "index.html",
 	"version": "0.2.1",
-	"auto-updater":{
-		"repo":"/Sigak/pc-voice-interface",
-		"branch":"trying-the-updator"
-	}
+	"auto-updater": {
+		"repo": "/Sigak/pc-voice-interface",
+		"branch": "trying-the-updator"
+	},
 	"window": {
 		"title": "Голосовое управление компьютером",
 		"toolbar": false,
@@ -14,15 +14,15 @@
 		"width": 350,
 		"height": 500,
 		"resizable": "false"
-	}
+	},
 	"repositories": [
        {
             "type": "git", 
             "url": "http://github.com/example.git"
        }
-	]
-	"bugs" : "https://github.com/Sigak/pc-voice-interface/issues"
-	"description" : "A node-webkit app to control your pc via voice commands."
+	],
+	"bugs" : "https://github.com/Sigak/pc-voice-interface/issues",
+	"description" : "A node-webkit app to control your pc via voice commands.",
 	"maintainers":[ {
 		"name": "Ezhova Anastasia",
 		"email": "anastasia-rggu@yandex.ru",
