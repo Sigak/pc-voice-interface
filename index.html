@@ -124,7 +124,7 @@
 			}
 			$( "<table/>", {html: items.join( "" )}).appendTo(container);
 		}
-	
+	console.log('Trying an autoupdate');
 	var autoupdater = require('auto-updater')({
         pathToJson: '',
         async: true,
