@@ -15,3 +15,4 @@ Anyway, even now it is very cool, 'cause you don't need to remember where your f
 
 To use it, you need to replace the variable 'yourAPIkey' in index.html with your Yandex SpeechKit API key. You can get it here: https://developer.tech.yandex.ru
 Then build an nw app by following this instructions: https://github.com/rogerwang/node-webkit
+An autoupdate function will work corectly if you pack the app files in package.nw and place it in node-webkit directory.
