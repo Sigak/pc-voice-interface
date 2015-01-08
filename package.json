@@ -4,7 +4,7 @@
 	"version": "0.2.1",
 	"auto-updater": {
 		"repo": "/Sigak/pc-voice-interface",
-		"branch": "trying-the-updator"
+		"branch": "master"
 	},
 	"single-instance": false,
 	"window": {
