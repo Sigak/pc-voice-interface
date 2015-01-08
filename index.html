@@ -143,7 +143,7 @@
 			sp.unref();
 			gui.App.quit();
 		} else {spawn('del', ['/q', copyPath]);}
-	}
+	} else {
 	
 	var admzip = require('adm-zip');
 	var autoupdater = require('auto-updater')({
@@ -213,7 +213,7 @@
 
     // Start checking
     autoupdater.forceCheck();
-	
+	}
     </script>
 </body>
 </html>
