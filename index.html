@@ -142,7 +142,7 @@
 			var sp = spawn(execPath+'nw.exe', [copyPath, execPath, true], {detached: true, stdio: [ 'ignore', out, err ]});
 			sp.unref();
 			gui.App.quit();
-		} else {spawn('del', ['/q', copyPath]);}
+		} else {spawn('rmdir', ['/s', '/q', copyPath]);}
 	} else {
 	
 	var admzip = require('adm-zip');
