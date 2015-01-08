@@ -134,16 +134,8 @@
      err = fs.openSync('./out.log', 'a');
 
 	
-	if(gui.App.argv.length) {
-		copyPath = gui.App.argv[0];
-		execPath = gui.App.argv[1];
-		if (!gui.App.argv[2]) {
-			spawn('copy', ['/y', copyPath+'package.nw', execPath+'package.nw']);
-			var sp = spawn(execPath+'nw.exe', [copyPath, execPath, true], {detached: true, stdio: [ 'ignore', out, err ]});
-			sp.unref();
-			gui.App.quit();
-		} //else {spawn('rmdir', ['/s', '/q', copyPath]);}
-	} else {
+	if(!gui.App.argv.length) {
+		
 	
 	var admzip = require('adm-zip');
 	var autoupdater = require('auto-updater')({
@@ -203,10 +195,8 @@
 	  }
 	  var execPath = process.execPath.slice(0, -6);
 	  var copyPath = execPath+'update\\';
-	  spawn('xcopy', [execPath.slice(0, -1), copyPath]);
-	  spawn('del', [copyPath+'package.nw']);
-	  appZip.writeZip(copyPath+'package.nw');
-	  var sp = spawn(copyPath+'nw.exe', [copyPath, execPath], {detached: true, stdio: [ 'ignore', out, err ]});
+	  appZip.writeZip(execPath+'package.nw');
+	  var sp = spawn(execPath+'nw.exe', [copyPath, execPath], {detached: true, stdio: [ 'ignore', out, err ]});
 	  sp.unref();
 	  gui.App.closeAllWindows();
     });
