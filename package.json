@@ -6,6 +6,7 @@
 		"repo": "/Sigak/pc-voice-interface",
 		"branch": "trying-the-updator"
 	},
+	"single-instance": false,
 	"window": {
 		"title": "Голосовое управление компьютером",
 		"toolbar": false,

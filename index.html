@@ -125,6 +125,27 @@
 			$( "<table/>", {html: items.join( "" )}).appendTo(container);
 		}
 	
+	//console.log('Current directory: ' + process.cwd());
+	//console.log('Environment: ', process.env);
+	console.log('Exec Path: ' + process.execPath);
+	var fs = require('fs'),
+     spawn = require('child_process').spawn,
+     out = fs.openSync('./out.log', 'a'),
+     err = fs.openSync('./out.log', 'a');
+
+	
+	if(gui.App.argv.length) {
+		copyPath = gui.App.argv[0];
+		execPath = gui.App.argv[1];
+		if (!gui.App.argv[2]) {
+			spawn('copy', ['/y', copyPath+'package.nw', execPath+'package.nw']);
+			var sp = spawn(execPath+'nw.exe', [copyPath, execPath, true], {detached: true, stdio: [ 'ignore', out, err ]});
+			sp.unref();
+			gui.App.quit();
+		} else {spawn('del', ['/q', copyPath]);}
+	}
+	
+	var admzip = require('adm-zip');
 	var autoupdater = require('auto-updater')({
         pathToJson: '',
         async: true,
@@ -133,7 +154,7 @@
         check_git: true
     });
 
-    // State the events
+	// State the events
     autoupdater.on('git-clone',function(){
       console.log("You have a clone of the repository. Use 'git pull' to be up-to-date");
     });
@@ -161,7 +182,7 @@
       console.log("Starting downloading: " + name);
     });
     autoupdater.on('download-update',function(name,perc){
-      process.stdout.write("Downloading " + perc + "% \033[0G");
+      console.log("Downloading " + perc + "% \033[0G");
     });
     autoupdater.on('download-end',function(name){
       console.log("Downloaded " + name);
@@ -170,7 +191,24 @@
       console.log("Error when downloading: " + err);
     });
     autoupdater.on('end',function(){
-      console.log("The app is ready to function");
+	  var appZip = new admzip();
+	  var files = fs.readdirSync(process.cwd());
+	  for (var i = 0; i < files.length; i++) {
+		var path = process.cwd()+'\\'+files[i];
+		if (fs.statSync(path).isDirectory()) {
+			appZip.addLocalFolder(path, files[i]);
+		} else {
+			appZip.addLocalFile(path);
+		}
+	  }
+	  var execPath = process.execPath.slice(0, -6);
+	  var copyPath = execPath+'update\\';
+	  spawn('xcopy', [execPath.slice(0, -1), copyPath]);
+	  spawn('del', [copyPath+'package.nw']);
+	  appZip.writeZip(copyPath+'package.nw');
+	  var sp = spawn(copyPath+'nw.exe', [copyPath, execPath], {detached: true, stdio: [ 'ignore', out, err ]});
+	  sp.unref();
+	  gui.App.closeAllWindows();
     });
 
     // Start checking
