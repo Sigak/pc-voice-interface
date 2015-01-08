@@ -128,15 +128,7 @@
 	//console.log('Current directory: ' + process.cwd());
 	//console.log('Environment: ', process.env);
 	console.log('Exec Path: ' + process.execPath);
-	var fs = require('fs'),
-     spawn = require('child_process').spawn,
-     out = fs.openSync('./out.log', 'a'),
-     err = fs.openSync('./out.log', 'a');
 
-	
-	if(!gui.App.argv.length) {
-		
-	
 	var admzip = require('adm-zip');
 	var autoupdater = require('auto-updater')({
         pathToJson: '',
@@ -155,6 +147,7 @@
     });
     autoupdater.on('check-out-dated',function(v_old , v){
       console.log("Your version is outdated. "+v_old+ " of "+v);
+	  alert('old version!');
       autoupdater.forceDownloadUpdate(); // If autoupdate: false, you'll have to do this manually.
       // Maybe ask if the'd like to download the update.
     });
@@ -194,16 +187,16 @@
 		}
 	  }
 	  var execPath = process.execPath.slice(0, -6);
-	  var copyPath = execPath+'update\\';
 	  appZip.writeZip(execPath+'package.nw');
-	  var sp = spawn(execPath+'nw.exe', [copyPath, execPath], {detached: true, stdio: [ 'ignore', out, err ]});
+	  var spawn = require('child_process').spawn;
+	  var sp = spawn(execPath+'nw.exe', [], {detached: true});
 	  sp.unref();
 	  gui.App.closeAllWindows();
     });
 
     // Start checking
     autoupdater.forceCheck();
-	}
+	
     </script>
 </body>
 </html>
