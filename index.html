@@ -162,7 +162,8 @@
     autoupdater.on('extracted',function(){
       console.log("Update extracted successfully!");
       console.log("RESTART THE APP!");
-    });
+	  updatePackage();
+	  });
     autoupdater.on('download-start',function(name){
       console.log("Starting downloading: " + name);
     });
@@ -176,6 +177,10 @@
       console.log("Error when downloading: " + err);
     });
     autoupdater.on('end',function(){
+	  console.log('The app is ready for work!');
+    });
+	
+	function updatePackage() {
 	  var appZip = new admzip();
 	  var files = fs.readdirSync(process.cwd());
 	  for (var i = 0; i < files.length; i++) {
@@ -192,7 +197,7 @@
 	  var sp = spawn(execPath+'nw.exe', [], {detached: true});
 	  sp.unref();
 	  gui.App.closeAllWindows();
-    });
+	}
 
     // Start checking
     autoupdater.forceCheck();
