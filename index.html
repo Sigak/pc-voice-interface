@@ -127,7 +127,7 @@
 	
 	//console.log('Current directory: ' + process.cwd());
 	//console.log('Environment: ', process.env);
-	console.log('Exec Path: ' + process.execPath);
+	//console.log('Exec Path: ' + process.execPath);
 
 	var admzip = require('adm-zip');
 	var autoupdater = require('auto-updater')({
@@ -137,32 +137,28 @@
         autoupdate: false,
         check_git: true
     });
-
-	// State the events
     autoupdater.on('check-up-to-date',function(v){
-      console.log("You have the latest version: " + v);
+	  if (gui.App.argv[0]) answer('Приложение обновлено до версии ' + v);
     });
     autoupdater.on('check-out-dated',function(v_old , v){
-      console.log("Your version is outdated. "+v_old+ " of "+v);
-	  alert('old version!');
-      autoupdater.forceDownloadUpdate(); // If autoupdate: false, you'll have to do this manually.
-      // Maybe ask if the'd like to download the update.
+      answer('Ваше приложение(' + v_old + ') можно обновить до версии ' + v);
+	  answer('<input type="button" value="Обновить" onclick="autoupdater.forceDownloadUpdate();">');
     });
     autoupdater.on('download-error',function(err){
       console.log("Error when downloading: " + err);
     });
     autoupdater.on('update-downloaded',function(){
-      autoupdater.forceExtract(); // If autoupdate: false, you'll have to do this manually.
+      autoupdater.forceExtract();
     });
     autoupdater.on('update-not-installed',function(){
-      autoupdater.forceExtract(); // If autoupdate: false, you'll have to do this manually.
+      autoupdater.forceExtract();
     });
     autoupdater.on('extracted',function(){
 	  updatePackage();
 	});
-    autoupdater.on('end',function(){
-	  console.log('The app is ready for work!');
-    });
+    //autoupdater.on('end',function(){
+	//});
+    autoupdater.forceCheck();
 	
 	function updatePackage() {
 	  var appZip = new admzip();
@@ -175,17 +171,13 @@
 			appZip.addLocalFile(path);
 		}
 	  }
-	  var execPath = process.execPath.slice(0, -6);
-	  appZip.writeZip(execPath+'package.nw');
+	  appZip.writeZip(process.execPath.slice(0, -6)+'package.nw');
 	  var spawn = require('child_process').spawn;
-	  var sp = spawn(execPath+'nw.exe', [], {detached: true});
+	  var sp = spawn(process.execPath, [true], {detached: true});
 	  sp.unref();
 	  gui.App.closeAllWindows();
 	}
 
-    // Start checking
-    autoupdater.forceCheck();
-	
     </script>
 </body>
 </html>
