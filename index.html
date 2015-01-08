@@ -125,9 +125,9 @@
 			$( "<table/>", {html: items.join( "" )}).appendTo(container);
 		}
 	
-	//console.log('Current directory: ' + process.cwd());
-	//console.log('Environment: ', process.env);
-	//console.log('Exec Path: ' + process.execPath);
+/**************************************
+/	Autoupdating the app
+***************************************/
 
 	var admzip = require('adm-zip');
 	var autoupdater = require('auto-updater')({
@@ -141,7 +141,7 @@
 	  if (gui.App.argv[0]) answer('Приложение обновлено до версии ' + v);
     });
     autoupdater.on('check-out-dated',function(v_old , v){
-      answer('Ваше приложение(' + v_old + ') можно обновить до версии ' + v);
+      answer('Доступно обновление до версии ' + v + '. Текущая версия ' + v_old + '.<BR>');
 	  answer('<input type="button" value="Обновить" onclick="autoupdater.forceDownloadUpdate();">');
     });
     autoupdater.on('download-error',function(err){
