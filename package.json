@@ -6,7 +6,7 @@
 		"repo": "/Sigak/pc-voice-interface",
 		"branch": "master"
 	},
-	"single-instance": false,
+	"single-instance": true,
 	"window": {
 		"title": "Голосовое управление компьютером",
 		"toolbar": false,
