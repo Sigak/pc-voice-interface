@@ -7,12 +7,10 @@ var commands = require('./commands.json');
 var operationId = 0;
 
 function writeCache() {
-	this.hide();
 	fs.writeFile('../../pc-voice-interface/pathcache.json', /* C:\Users\UserName\AppData\Local\ */
 				JSON.stringify(paths, "", 4), 
 				function (err) {if (err) console.log('Ошибка записи в pathcache.json: ', err);}
 	);
-	this.close(true);
 }
 
 function getUserChoise(name) {
