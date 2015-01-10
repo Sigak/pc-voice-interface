@@ -1,16 +1,16 @@
 {
 	"name": "pc-voice-interface",
 	"main": "index.html",
-	"version": "0.2.2",
+	"version": "0.2.3",
 	"auto-updater": {
 		"repo": "/Sigak/pc-voice-interface",
 		"branch": "master"
 	},
-	"single-instance": false,
 	"window": {
 		"title": "Голосовое управление компьютером",
 		"toolbar": false,
 		"frame": false,
+		"show": false,
 		"show_in_taskbar": false,
 		"width": 350,
 		"height": 500,

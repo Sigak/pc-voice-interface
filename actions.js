@@ -37,9 +37,9 @@ function drawENOENT(filename) {
 }
 
 function executeCommand(action, subject) {
-	if (subject.length<3) {answer('Слишком короткое имя файла!'); return;}
 	operationId++;
 	if (commands.executeFile[action]) {
+		if (subject.length<3) {answer('Слишком короткое имя файла!'); return;}
 		if (!paths[subject]) findAndStart(subject);
 		else executeFile(subject, findAndStart.bind(null, subject));
 	} else answer('Пока не умею!');
@@ -113,6 +113,10 @@ function answer(template, variables, parent) {
         str = str.split('<%' + key + '%>').join(variables[key]);
     }
 	$lastInst = $('.container').children(':last');
-	return $lastInst.hasClass('app_voice') ? $lastInst.append(str) : 
-	$(parent || '<div/>', {html: str}).addClass('app_voice').appendTo('.container');
+	if ($lastInst.hasClass('app_voice')) {$lastInst.append(str)}
+	else {
+		$lastInst = $(parent || '<div/>', {html: str}).addClass('app_voice').appendTo('.container');
+		notify();
+	}
+	return $lastInst;
 }

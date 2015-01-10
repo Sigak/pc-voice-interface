@@ -25,18 +25,35 @@
 	<script>
 		var gui = require('nw.gui');
 		var win = gui.Window.get();
+		win.isVisible = false;
+		win.on('minimize', function() {win.isVisible = false;});
 		$('#window-close').on("click", function() {win.close();});
 		$('#window-min').on("click", function() {win.minimize();});
 		$('#settings').on("click", function() {win.showDevTools();});
 		var tray = new gui.Tray({icon: 'pic/ico.png' });
-		tray.on('click', function() {win.show();});
+		tray.on('click', function() {win.show(); win.isVisible = true;});
+		win.on('close', writeCache);
+		if (require('os').uptime() > 180) {win.show(); win.isVisible = true;} // запуск не из автозагрузки, значит не надо прятать в трее
+		gui.App.on('open', function(cmdline) {win.show(); win.isVisible = true;});
 		$('body').on('dragenter', false).on('dragover', false).on('dragleave', false)
 			.on('dragend', false).on('drop', false);
-		win.on('close', writeCache);
 		var container = $('.container')[0];
+		var mic = $('#mic_btn');
+		var shortcut = new gui.Shortcut({key: 'Alt+S'});
+		gui.App.registerGlobalHotKey(shortcut);
+		shortcut.on('active', function() {mic.trigger('click');});
+		shortcut.on('failed', function(msg) {console.log(msg);});
 		
 		function scrollDown() {
 			container.scrollTop = container.scrollHeight - container.clientHeight;
+		}
+		
+		function notify() {
+			if (win.isVisible) return;
+			var messege = $('.app_voice').last().contents().first().text();
+			var notification = new Notification('PC Voice Interface', {icon: 'pic/mic.png',	body: messege});
+			notification.onclick = function () {win.show(); win.isVisible = true;}
+			notification.onshow = function () {setTimeout(function() {notification.close();}, 1000);}
 		}
 		
         var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -45,8 +62,7 @@
                 });
         var key = yourAPIkey; // You can get it here: https://developer.tech.yandex.ru
         var dict = new webspeechkit.Dictation("wss://webasr.yandex.net/asrsocket.ws", uuid, key);
-		var mic = $('#mic_btn');
-        		
+		        		
 		mic.on("click", function() {
 			if (mic.hasClass("active_mic")) {dict.stop(); mic.removeClass("active_mic");}
 			else {
@@ -138,7 +154,11 @@
         check_git: true
     });
     autoupdater.on('check-up-to-date',function(v){
-	  if (gui.App.argv[0]) answer('Приложение обновлено до версии ' + v);
+	  if (gui.App.argv[1]) {
+	    win.show();
+		win.isVisible = true;
+		answer('Приложение обновлено до версии ' + v);
+	  }
     });
     autoupdater.on('check-out-dated',function(v_old , v){
       answer('Доступно обновление до версии ' + v + '. Текущая версия ' + v_old + '.<BR>');
@@ -147,17 +167,10 @@
     autoupdater.on('download-error',function(err){
       console.log("Error when downloading: " + err);
     });
-    autoupdater.on('update-downloaded',function(){
-      autoupdater.forceExtract();
-    });
-    autoupdater.on('update-not-installed',function(){
-      autoupdater.forceExtract();
-    });
-    autoupdater.on('extracted',function(){
-	  updatePackage();
-	});
-    //autoupdater.on('end',function(){
-	//});
+    autoupdater.on('update-downloaded',function(){autoupdater.forceExtract();});
+    autoupdater.on('update-not-installed',function(){autoupdater.forceExtract();});
+    autoupdater.on('extracted',function(){updatePackage();});
+    //autoupdater.on('end',function(){});
     autoupdater.forceCheck();
 	
 	function updatePackage() {
@@ -173,7 +186,7 @@
 	  }
 	  appZip.writeZip(process.execPath.slice(0, -6)+'package.nw');
 	  var spawn = require('child_process').spawn;
-	  var sp = spawn(process.execPath, [true], {detached: true});
+	  var sp = spawn(process.execPath, ['', true], {detached: true});
 	  sp.unref();
 	  gui.App.closeAllWindows();
 	}
