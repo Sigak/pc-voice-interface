@@ -33,7 +33,7 @@
 		var tray = new gui.Tray({icon: 'pic/ico.png' });
 		tray.on('click', function() {win.show(); win.isVisible = true;});
 		if (require('os').uptime() > 180) {win.show(); win.isVisible = true;} // запуск не из автозагрузки, значит не надо прятать в трее
-		gui.App.on('open', function(cmdline) {win.show(); win.isVisible = true;});
+		gui.App.on('open', function(cmdline) {console.log('открыт тот же экземпляр!'); win.show(); win.isVisible = true;});
 		$('body').on('dragenter', false).on('dragover', false).on('dragleave', false)
 			.on('dragend', false).on('drop', false);
 		var container = $('.container')[0];
@@ -159,6 +159,7 @@
         check_git: true
     });
     autoupdater.on('check-up-to-date',function(v){
+	console.log(gui.App.argv);
 	  if (gui.App.argv[1]) {
 	    win.show();
 		win.isVisible = true;
