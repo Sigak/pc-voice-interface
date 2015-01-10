@@ -159,6 +159,7 @@
         check_git: true
     });
     autoupdater.on('check-up-to-date',function(v){
+	console.log(gui.App.argv);
 	  if (gui.App.argv[1]) {
 	    win.show();
 		win.isVisible = true;
