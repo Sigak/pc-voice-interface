@@ -192,7 +192,7 @@
 	  }
 	  appZip.writeZip(process.execPath.slice(0, -6)+'package.nw');
 	  var spawn = require('child_process').spawn;
-	  var sp = spawn(process.execPath, ['', true], {detached: true});
+	  var sp = spawn(process.execPath, [true, true], {detached: true});
 	  sp.unref();
 	  gui.App.closeAllWindows();
 	}
